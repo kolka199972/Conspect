@@ -1,14 +1,30 @@
-import React, {useState} from 'react'
-import {episodes} from '../fakeStorage/episodes'
+import React, {useEffect, useState} from 'react'
+import {fetchAll, fetchYears} from '../fakeApi/episodesApi'
 import {paginate} from '../utils/paginate'
 import Episode from './episode'
+import GroupList from './groupList'
 import Pagination from './pagination'
-import PropTypes from 'prop-types'
 
 const EpisodesList = () => {
-  const count = episodes.length
-  const pageSize = 8
   const [currentPage, setCurrentPage] = useState(1)
+  const [episodes, setEpisodes] = useState([])
+  const [years, setYears] = useState([])
+  const [filter, setFilter] = useState()
+  const count = episodes.length
+  const pageSize = 6
+
+  const getEpisodes = (year) => {
+    fetchAll(year).then((response) => setEpisodes(response))
+    setCurrentPage(1)
+  }
+
+  useEffect(() => {
+    getEpisodes(filter)
+  }, [filter])
+
+  useEffect(() => {
+    fetchYears().then((response) => setYears(response))
+  }, [])
 
   const pageEpisodes = paginate(episodes, currentPage, pageSize)
 
@@ -16,30 +32,52 @@ const EpisodesList = () => {
     setCurrentPage(pageIndex)
   }
 
+  const handleFilterChange = (filter) => {
+    setFilter(filter)
+  }
+
+  const handleReset = () => {
+    setFilter()
+  }
+
   return (
-    <div className='container'>
+    <div className='container pt-2'>
       <div className='row'>
-        {pageEpisodes.map((episode) => (
-          <Episode key={episode.id} {...episode} />
-        ))}
-      </div>
-      <div className='row'>
-        <Pagination
-          itemsCount={count}
-          pageSize={pageSize}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
+        <div className='col-4'>
+          {!!years.length && (
+            <>
+              <GroupList
+                items={years}
+                filter={filter}
+                onChangeFilter={handleFilterChange}
+              />
+              <hr />
+              <div className='d-grid'>
+                <button onClick={handleReset} className='btn btn-m btn-primary'>
+                  Очистить
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+        <div className='col-8'>
+          <div className='row'>
+            {pageEpisodes.map((episode) => (
+              <Episode key={episode.id} {...episode} />
+            ))}
+          </div>
+          <div className='row'>
+            <Pagination
+              itemsCount={count}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
-}
-
-Pagination.propTypes = {
-  itemsCount: PropTypes.number.isRequired,
-  pageSize: PropTypes.number.isRequired,
-  currentPage: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired
 }
 
 export default EpisodesList
