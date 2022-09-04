@@ -14,6 +14,7 @@ module.exports = {
   plugins: ['react'],
   rules: {
     'react/prop-types': 'off',
-    'object-curly-spacing': 'off'
+    'object-curly-spacing': 'off',
+    'no-prototype-builtins': 'off'
   }
 }

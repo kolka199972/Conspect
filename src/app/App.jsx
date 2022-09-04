@@ -1,8 +1,19 @@
 import React from 'react'
-import MyForm from './components/MyForm'
+import {Route, Switch} from 'react-router-dom'
+import FeedbackPage from './pages/FeedbackPage'
+import MainPage from './pages/MainPage'
+import OrderPage from './pages/OrderPage'
 
 const App = () => {
-  return <MyForm />
+  return (
+    <div className='container mt-4'>
+      <Switch>
+        <Route path='/' exact component={MainPage} />
+        <Route path='/feedback' component={FeedbackPage} />
+        <Route path='/order' component={OrderPage} />
+      </Switch>
+    </div>
+  )
 }
 
 export default App
